@@ -3,6 +3,8 @@ workbench
 __pycache__
 venv
 .langgraph_api
+.cursor
+LLM_data
 
 # Files
 .env

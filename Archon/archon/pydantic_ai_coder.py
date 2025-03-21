@@ -75,7 +75,7 @@ async def retrieve_relevant_documentation(ctx: RunContext[PydanticAIDeps], user_
 @pydantic_ai_coder.tool
 async def list_documentation_pages(ctx: RunContext[PydanticAIDeps]) -> List[str]:
     """
-    Retrieve a list of all available Pydantic AI documentation pages.
+    Retrieve a list of all available documentation pages.
     
     Returns:
         List[str]: List of unique URLs for all documentation pages

@@ -8,7 +8,7 @@ import httpx
 import os
 import sys
 import json
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, RunContext
 from pydantic_ai.models.anthropic import AnthropicModel
@@ -51,7 +51,7 @@ tools_refiner_agent = Agent(
 )
 
 @tools_refiner_agent.tool
-async def retrieve_relevant_documentation(ctx: RunContext[ToolsRefinerDeps], query: str) -> str:
+async def retrieve_relevant_documentation(ctx: RunContext[ToolsRefinerDeps], query: str, sources: Optional[List[str]] = None) -> str:
     """
     Retrieve relevant documentation chunks based on the query with RAG.
     Make sure your searches always focus on implementing tools.
@@ -59,34 +59,46 @@ async def retrieve_relevant_documentation(ctx: RunContext[ToolsRefinerDeps], que
     Args:
         ctx: The context including the Supabase client and OpenAI client
         query: Your query to retrieve relevant documentation for implementing tools
+        sources: Optional list of documentation sources to search in. Available sources: 
+                'pydantic_ai_docs', 'crawl4ai_docs', 'langchain_python_docs'
+                If None, searches all available sources.
         
     Returns:
-        A formatted string containing the top 4 most relevant documentation chunks
+        A formatted string containing the most relevant documentation chunks
     """
-    return await retrieve_relevant_documentation_tool(ctx.deps.supabase, ctx.deps.embedding_client, query)
+    return await retrieve_relevant_documentation_tool(ctx.deps.supabase, ctx.deps.embedding_client, query, sources)
 
 @tools_refiner_agent.tool
-async def list_documentation_pages(ctx: RunContext[ToolsRefinerDeps]) -> List[str]:
+async def list_documentation_pages(ctx: RunContext[ToolsRefinerDeps], source: Optional[str] = None) -> List[str]:
     """
-    Retrieve a list of all available Pydantic AI documentation pages.
+    Retrieve a list of all available documentation pages.
     This will give you all pages available, but focus on the ones related to tools.
-    
-    Returns:
-        List[str]: List of unique URLs for all documentation pages
-    """
-    return await list_documentation_pages_tool(ctx.deps.supabase)
-
-@tools_refiner_agent.tool
-async def get_page_content(ctx: RunContext[ToolsRefinerDeps], url: str) -> str:
-    """
-    Retrieve the full content of a specific documentation page by combining all its chunks.
-    Only use this tool to get pages related to using tools with Pydantic AI.
     
     Args:
         ctx: The context including the Supabase client
-        url: The URL of the page to retrieve
+        source: Optional documentation source to filter by. Available sources:
+               'pydantic_ai_docs', 'crawl4ai_docs', 'langchain_python_docs'
+               If None, returns pages from all sources.
+    
+    Returns:
+        List[str]: List of unique URLs for all documentation pages with source prefixes
+    """
+    return await list_documentation_pages_tool(ctx.deps.supabase, source)
+
+@tools_refiner_agent.tool
+async def get_page_content(ctx: RunContext[ToolsRefinerDeps], url: str, source: Optional[str] = None) -> str:
+    """
+    Retrieve the full content of a specific documentation page by combining all its chunks.
+    Use this tool to get pages related to using tools with Pydantic AI, Crawl4AI and Langchain Python.
+    
+    Args:
+        ctx: The context including the Supabase client
+        url: The URL of the page to retrieve (can include source prefix like '[Pydantic AI] url')
+        source: Optional documentation source to use. Available sources:
+               'pydantic_ai_docs', 'crawl4ai_docs', 'langchain_python_docs'
+               If None, attempts to determine the source from the URL or find the page without filtering.
         
     Returns:
         str: The complete page content with all chunks combined in order
     """
-    return await get_page_content_tool(ctx.deps.supabase, url)
+    return await get_page_content_tool(ctx.deps.supabase, url, source)

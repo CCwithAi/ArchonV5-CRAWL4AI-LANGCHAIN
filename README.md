@@ -1,4 +1,4 @@
-Add Langchain Python and Crawl4AI Documentation Crawling Support
+Add Langchain Python and Crawl4AI Documentation Crawling Support. AI Agent will use Agentic RAG.
 
 This PR adds a new capability to Archon: the ability to crawl and index both Langchain Python documentation and Crawl4AI documentation, similar to how the existing Pydantic AI documentation crawler works.
 New Features

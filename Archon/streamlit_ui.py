@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import streamlit as st
 import logfire
 import asyncio
+import atexit
 
 # Set page config - must be the first Streamlit command
 st.set_page_config(
@@ -34,8 +35,27 @@ openai_client, supabase = get_clients()
 # Load custom CSS styles
 load_css()
 
-# Configure logfire to suppress warnings (optional)
+# Configure logfire
 logfire.configure(send_to_logfire='never')
+
+# Register cleanup handler for shutdown
+def cleanup_resources():
+    """Clean up resources and finalize logfire before shutdown"""
+    print("Cleaning up resources before shutdown...")
+    # Attempt to gracefully shutdown OpenTelemetry
+    try:
+        import importlib
+        if hasattr(logfire, 'deinit'):
+            logfire.deinit()
+        elif hasattr(logfire, 'shutdown'):
+            logfire.shutdown()
+    except:
+        pass
+
+# Register with both streamlit and atexit
+if hasattr(st, 'on_shutdown'):
+    st.on_shutdown(cleanup_resources)
+atexit.register(cleanup_resources)
 
 async def main():
     # Check for tab query parameter

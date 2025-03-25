@@ -84,3 +84,6 @@ async def chat_tab():
                     message_placeholder.markdown(response_content)
         
         st.session_state.messages.append({"type": "ai", "content": response_content})
+
+# Make sure to export the chat_tab function
+__all__ = ["chat_tab"]

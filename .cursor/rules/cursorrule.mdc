@@ -1,9 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-
-#   remember to use PYDANTIC.AI and use tool call ARCHON if you are unsure, remember you do not know pydantic.ai as it is a new framework released after your knolledge base dates. so you must ask ARCHON or check the files here [https_ai_pydantic_dev_multi-agent-applications_.md](mdc:LLM_data/pydantic.ai/https_ai_pydantic_dev_multi-agent-applications_.md) and also many other in the LLM_data folder.
-- You can @ files here
-- You can use markdown but dont have to
